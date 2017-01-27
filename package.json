@@ -1,0 +1,11 @@
+{
+  "name": "my-config",
+  "version": "0.0.1",
+  "description": "config module, standard for all microservices. Pulls the config from ConfigJS service and provide interface to this config.",
+  "main": "./compiled/myConfig.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yury Prokashev",
+  "license": "ISC"
+}
