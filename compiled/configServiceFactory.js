@@ -14,6 +14,7 @@ module.exports = function (configObject) {
         returnChildProperty = void 0;
 
     copyProperty = function copyProperty(fromObj, toObj) {
+        console.log(fromObj);
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
         var _iteratorError = undefined;

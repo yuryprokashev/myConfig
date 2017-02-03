@@ -13,6 +13,7 @@ module.exports = configObject => {
         returnChildProperty;
 
     copyProperty = (fromObj, toObj) => {
+        console.log(fromObj);
         for(let key of fromObj) {
             if(toObj[key] !== undefined) {
                 Object.defineProperty(toObj, key, {
