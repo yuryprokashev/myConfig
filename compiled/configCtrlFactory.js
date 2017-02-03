@@ -18,6 +18,7 @@ module.exports = function (configService, kafkaService) {
         if (context !== null) {
             configService.write(context.response);
             configCtrl.emit('ready');
+            console.log('configCtrl ready');
         } else {
             configCtrl.emit('error', { error: 'kafkaMessage.value is null' });
         }
