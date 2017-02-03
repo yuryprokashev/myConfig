@@ -13,7 +13,6 @@ module.exports = configObject => {
         returnChildProperty;
 
     copyProperty = (fromObj, toObj) => {
-        console.log(fromObj);
         for(let key in fromObj) {
             if(toObj[key] !== undefined) {
                 Object.defineProperty(toObj, key, {
@@ -34,7 +33,7 @@ module.exports = configObject => {
             return targetObj[childPropertyName];
         }
         else {
-            throw new Error(`ERROR: child property ${childPropertyName} not exists at ${targetObj}`);
+            throw new Error(`ERROR: child property ${childPropertyName} not exists at ${JSON.stringify(targetObj)}`);
         }
     };
 
