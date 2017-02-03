@@ -3,10 +3,13 @@
  */
 'use strict';
 const EventEmitter = require('events').EventEmitter;
+
 module.exports = (configService, kafkaService) => {
     let configCtrl = new EventEmitter();
 
-    configCtrl.writeConfig = (kafkaMessage) => {
+    let write;
+
+    write = (kafkaMessage) => {
         let context, query, data;
         context = kafkaService.extractContext(kafkaMessage);
         if(context !== null) {
@@ -18,6 +21,14 @@ module.exports = (configService, kafkaService) => {
         }
 
     };
+
+    kafkaService.subscribe('get-config-response', true, write);
+
+    configService.getEnvObject().then(
+        (envObject) => {
+            kafkaService.send('get-config-request', true, envObject);
+        }
+    );
 
     return configCtrl;
 };
