@@ -46,6 +46,7 @@ module.exports = configObject => {
             let pathArray = propertyString.split('.');
             let depth = pathArray.length;
             let firstNode = configObject;
+            let i = 0;
             do {
                 firstNode = returnChildProperty(firstNode, pathArray[i]);
                 i++;

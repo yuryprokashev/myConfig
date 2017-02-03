@@ -44,6 +44,7 @@ module.exports = function (configObject) {
             var pathArray = propertyString.split('.');
             var depth = pathArray.length;
             var firstNode = configObject;
+
             do {
                 firstNode = returnChildProperty(firstNode, pathArray[i]);
                 i++;
