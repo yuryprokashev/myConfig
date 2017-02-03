@@ -14,7 +14,7 @@ module.exports = configObject => {
 
     copyProperty = (fromObj, toObj) => {
         console.log(fromObj);
-        for(let key of fromObj) {
+        for(let key in fromObj) {
             if(toObj[key] !== undefined) {
                 Object.defineProperty(toObj, key, {
                     configurable: true,
