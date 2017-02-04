@@ -71,5 +71,6 @@ module.exports = function (configObject) {
             });
         });
     };
+    console.log('configService returned -> ' + JSON.stringify());
     return configService;
 };

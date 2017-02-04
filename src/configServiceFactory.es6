@@ -74,5 +74,6 @@ module.exports = configObject => {
             }
         )
     };
+    console.log(`configService returned -> ${JSON.stringify(configService)}`);
     return configService;
 };
