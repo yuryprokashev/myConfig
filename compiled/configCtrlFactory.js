@@ -4,16 +4,17 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
+var guid = require('./guid');
 
 module.exports = function (configService, kafkaService) {
     var configCtrl = new EventEmitter();
 
     var write = void 0;
 
+    var configSignature = void 0;
+
     write = function write(kafkaMessage) {
-        var context = void 0,
-            query = void 0,
-            data = void 0;
+        var context = void 0;
         context = kafkaService.extractContext(kafkaMessage);
         if (context !== null) {
             configService.write(context.response);
@@ -24,10 +25,12 @@ module.exports = function (configService, kafkaService) {
         }
     };
 
-    kafkaService.subscribe('get-config-response', true, write);
+    configSignature = guid();
+
+    kafkaService.subscribe('get-config-response', configSignature, write);
 
     configService.getEnvObject().then(function (envObject) {
-        kafkaService.send('get-config-request', true, envObject);
+        kafkaService.send('get-config-request', configSignature, envObject);
     });
 
     return configCtrl;

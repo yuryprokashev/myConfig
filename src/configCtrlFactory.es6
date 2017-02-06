@@ -3,14 +3,17 @@
  */
 'use strict';
 const EventEmitter = require('events').EventEmitter;
+const guid = require('./guid');
 
 module.exports = (configService, kafkaService) => {
     let configCtrl = new EventEmitter();
 
     let write;
+    
+    let configSignature;
 
-    write = (kafkaMessage) => {
-        let context, query, data;
+    write = kafkaMessage => {
+        let context;
         context = kafkaService.extractContext(kafkaMessage);
         if(context !== null) {
             configService.write(context.response);
@@ -23,11 +26,13 @@ module.exports = (configService, kafkaService) => {
 
     };
 
-    kafkaService.subscribe('get-config-response', true, write);
+    configSignature = guid();
+
+    kafkaService.subscribe('get-config-response', configSignature, write);
 
     configService.getEnvObject().then(
         (envObject) => {
-            kafkaService.send('get-config-request', true, envObject);
+            kafkaService.send('get-config-request', configSignature, envObject);
         }
     );
 
