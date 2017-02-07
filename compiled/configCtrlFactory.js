@@ -26,6 +26,7 @@ module.exports = function (configService, kafkaService) {
     };
 
     configSignature = guid();
+    console.log('config request signed with ' + configSignature);
 
     kafkaService.subscribe('get-config-response', configSignature, write);
 
