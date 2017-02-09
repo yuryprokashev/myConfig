@@ -37,7 +37,7 @@ module.exports = (configService, kafkaService, EventEmitter) => {
 
     configService.getEnvObject().then(
         (envObject) => {
-            kafkaService.send('get-config-request', configSignature, envObject);
+            kafkaService.send('get-config-request', envObject);
         },
         (error) => {
             configCtrl.emit('logger.agent.error', error);
