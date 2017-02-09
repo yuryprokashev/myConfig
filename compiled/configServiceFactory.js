@@ -5,8 +5,8 @@
 
 var dns = require('dns');
 var os = require('os');
-module.exports = function (configObject) {
-    var configService = {};
+module.exports = function (configObject, EventEmitter) {
+    var configService = new EventEmitter();
 
     var hostName = void 0;
 
@@ -32,7 +32,7 @@ module.exports = function (configObject) {
         if (targetObj[childPropertyName] !== undefined) {
             return targetObj[childPropertyName];
         } else {
-            throw new Error('ERROR: child property ' + childPropertyName + ' not exists at ' + JSON.stringify(targetObj));
+            return configService.packLogMessage(undefined, 'Child property ' + childPropertyName + ' not exists at ' + JSON.stringify(targetObj));
         }
     };
 
@@ -46,7 +46,11 @@ module.exports = function (configObject) {
             var i = 0;
             do {
                 firstNode = returnChildProperty(firstNode, pathArray[i]);
-                i++;
+                if (configService.isLogMessage(firstNode)) {
+                    i = depth;
+                } else {
+                    i++;
+                }
             } while (i < depth);
             return firstNode;
         }
@@ -62,7 +66,8 @@ module.exports = function (configObject) {
         return new Promise(function (resolve, reject) {
             dns.lookup(hostName, { family: 4 }, function (err, address, family) {
                 if (err) {
-                    reject(err);
+                    var logMessage = configService.packLogMessage(undefined, 'error in dns lookup\n' + err);
+                    reject(logMessage);
                 }
                 resolve({
                     serviceName: configObject.serviceName,
@@ -71,6 +76,5 @@ module.exports = function (configObject) {
             });
         });
     };
-    console.log('configService returned -> ' + configService);
     return configService;
 };

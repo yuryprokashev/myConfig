@@ -3,8 +3,9 @@
  */
 'use strict';
 
-module.exports = (serviceName) => {
-    let configObject = {serviceName: serviceName};
+module.exports = (serviceName, EventEmitter) => {
+    let configObject = new EventEmitter();
+    configObject.serviceName = serviceName;
 
     return configObject;
 };

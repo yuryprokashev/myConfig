@@ -2,11 +2,11 @@
  *Created by py on 24/01/2017
  */
 'use strict';
+// const EventEmitter = require('events').EventEmitter;
 
-var EventEmitter = require('events').EventEmitter;
 var guid = require('./guid');
 
-module.exports = function (configService, kafkaService) {
+module.exports = function (configService, kafkaService, EventEmitter) {
     var configCtrl = new EventEmitter();
 
     var write = void 0;
@@ -18,20 +18,26 @@ module.exports = function (configService, kafkaService) {
         context = kafkaService.extractContext(kafkaMessage);
         if (context !== null) {
             configService.write(context.response);
+            var _logMessage = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
+            configCtrl.emit('logger.agent.log', _logMessage);
             configCtrl.emit('ready');
-            console.log('configCtrl ready');
         } else {
-            configCtrl.emit('error', { error: 'kafkaMessage.value is null' });
+            var _logMessage2 = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
+            configCtrl.emit('logger.agent.error', _logMessage2);
         }
     };
 
     configSignature = guid();
-    console.log('config request signed with ' + configSignature);
+
+    var logMessage = configCtrl.packLogMessage(undefined, 'config request signed with ' + configSignature);
+    configCtrl.emit('logger.agent.log', logMessage);
 
     kafkaService.subscribe('get-config-response', configSignature, write);
 
     configService.getEnvObject().then(function (envObject) {
         kafkaService.send('get-config-request', configSignature, envObject);
+    }, function (error) {
+        configCtrl.emit('logger.agent.error', error);
     });
 
     return configCtrl;

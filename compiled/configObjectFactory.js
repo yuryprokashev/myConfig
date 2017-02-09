@@ -3,8 +3,9 @@
  */
 'use strict';
 
-module.exports = function (serviceName) {
-  var configObject = { serviceName: serviceName };
+module.exports = function (serviceName, EventEmitter) {
+    var configObject = new EventEmitter();
+    configObject.serviceName = serviceName;
 
-  return configObject;
+    return configObject;
 };
