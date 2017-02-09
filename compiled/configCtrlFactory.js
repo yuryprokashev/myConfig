@@ -29,9 +29,6 @@ module.exports = function (configService, kafkaService, EventEmitter) {
 
     configSignature = guid();
 
-    var logMessage = configCtrl.packLogMessage(undefined, 'config request signed with ' + configSignature);
-    configCtrl.emit('logger.agent.log', logMessage);
-
     kafkaService.subscribe('get-config-response', configSignature, write);
 
     configService.getEnvObject().then(function (envObject) {
