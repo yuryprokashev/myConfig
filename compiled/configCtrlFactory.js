@@ -21,14 +21,13 @@ module.exports = function (configService, kafkaService, EventEmitter) {
         context = kafkaService.extractContext(kafkaMessage);
         isMyMessage = kafkaService.isMyMessage(configSignature, kafkaMessage);
 
-        if (context !== null && isMyMessage === true) {
+        if (!context instanceof Error && isMyMessage === true) {
             configService.write(context.response);
-            var logMessage = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
-            configCtrl.emit('logger.agent.log', logMessage);
+            configCtrl.emit('logger.agent.log', 'everything is fine, config is written');
             configCtrl.emit('ready');
         } else if (context == null) {
-            var _logMessage = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
-            configCtrl.emit('logger.agent.error', _logMessage);
+            var error = new Error('kafkaMessage.value is null');
+            configCtrl.emit('logger.agent.error', error);
         } else if (isMyMessage === false) {}
     };
 
