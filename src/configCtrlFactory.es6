@@ -37,7 +37,7 @@ module.exports = (configService, kafkaService, EventEmitter) => {
 
 
     configCtrl.start = () => {
-        
+
         kafkaService.subscribe('get-config-response', write);
 
         configService.getEnvObject().then(
