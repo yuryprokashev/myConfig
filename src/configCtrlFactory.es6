@@ -15,21 +15,25 @@ module.exports = (configService, kafkaService, EventEmitter) => {
     configSignature = guid();
 
     write = kafkaMessage => {
-        let context, isMyMessage;
+        let context, isMyMessage, isContextOk;
         context = kafkaService.extractContext(kafkaMessage);
         isMyMessage = kafkaService.isMyMessage(configSignature, kafkaMessage);
+        isContextOk = !(context instanceof Error);
 
-        if(!context instanceof Error && isMyMessage === true) {
+        if(isContextOk && isMyMessage === true) {
             configService.write(context.response);
-            configCtrl.emit('logger.agent.log', 'everything is fine, config is written');
+            configCtrl.emit('logger.agent.log', 'write() in confirCtrl', 'everything is fine, config is written');
             configCtrl.emit('ready');
         }
-        else if (context == null) {
+        else if (!isContextOk) {
             let error = new Error('kafkaMessage.value is null');
             configCtrl.emit('logger.agent.error', error);
         }
         else if(isMyMessage === false) {
-
+            configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'message arrived, but it is not mine');
+        }
+        else {
+            configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'weird thing happened');
         }
 
     };
@@ -44,7 +48,7 @@ module.exports = (configService, kafkaService, EventEmitter) => {
                 let context;
                 context = kafkaService.createContext(configSignature, {}, envObject);
                 kafkaService.send('get-config-request', context);
-                configCtrl.emit('logger.agent.log', configService.getEnvObject.name, 'config controller started');
+                configCtrl.emit('logger.agent.log', 'configService.getEnvObject', 'env object sent');
             },
             (error) => {
                 configCtrl.emit('logger.agent.error', error);
