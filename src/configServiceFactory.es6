@@ -33,7 +33,7 @@ module.exports = (configObject, EventEmitter) => {
             return targetObj[childPropertyName];
         }
         else {
-            return configService.packLogMessage(this, `Child property ${childPropertyName} not exists at ${JSON.stringify(targetObj)}`);
+            return new Error(`Child property ${childPropertyName} not exists at ${JSON.stringify(targetObj)}`);
         }
     };
 
@@ -48,7 +48,7 @@ module.exports = (configObject, EventEmitter) => {
             let i = 0;
             do {
                 firstNode = returnChildProperty(firstNode, pathArray[i]);
-                if(configService.isLogMessage(firstNode)){
+                if(firstNode instanceof Error){
                     i = depth;
                 }
                 else {
@@ -71,8 +71,8 @@ module.exports = (configObject, EventEmitter) => {
             (resolve, reject) => {
                 dns.lookup(hostName, {family: 4},(err, address, family) => {
                     if(err){
-                        let logMessage = configService.packLogMessage(this, `error in dns lookup\n${err}`);
-                        reject(logMessage)
+                        let error = new Error(`error in dns lookup\n${err}`);
+                        reject(error)
                     }
                     resolve({
                         serviceName: configObject.serviceName,

@@ -32,7 +32,7 @@ module.exports = function (configObject, EventEmitter) {
         if (targetObj[childPropertyName] !== undefined) {
             return targetObj[childPropertyName];
         } else {
-            return configService.packLogMessage(undefined, 'Child property ' + childPropertyName + ' not exists at ' + JSON.stringify(targetObj));
+            return new Error('Child property ' + childPropertyName + ' not exists at ' + JSON.stringify(targetObj));
         }
     };
 
@@ -46,7 +46,7 @@ module.exports = function (configObject, EventEmitter) {
             var i = 0;
             do {
                 firstNode = returnChildProperty(firstNode, pathArray[i]);
-                if (configService.isLogMessage(firstNode)) {
+                if (firstNode instanceof Error) {
                     i = depth;
                 } else {
                     i++;
@@ -66,8 +66,8 @@ module.exports = function (configObject, EventEmitter) {
         return new Promise(function (resolve, reject) {
             dns.lookup(hostName, { family: 4 }, function (err, address, family) {
                 if (err) {
-                    var logMessage = configService.packLogMessage(undefined, 'error in dns lookup\n' + err);
-                    reject(logMessage);
+                    var error = new Error('error in dns lookup\n' + err);
+                    reject(error);
                 }
                 resolve({
                     serviceName: configObject.serviceName,
