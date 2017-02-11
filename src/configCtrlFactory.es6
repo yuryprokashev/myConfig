@@ -45,6 +45,7 @@ module.exports = (configService, kafkaService, EventEmitter) => {
                 let context;
                 context = kafkaService.createContext(configSignature, {}, envObject);
                 kafkaService.send('get-config-request', context);
+                configCtrl.emit('logger.agent.log', 'config controller started');
             },
             (error) => {
                 configCtrl.emit('logger.agent.error', error);
