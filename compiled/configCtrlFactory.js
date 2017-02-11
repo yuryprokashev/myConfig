@@ -13,32 +13,37 @@ module.exports = function (configService, kafkaService, EventEmitter) {
 
     var configSignature = void 0;
 
-    write = function write(kafkaMessage) {
-        var context = void 0;
-        context = kafkaService.extractContext(kafkaMessage);
-        if (context !== null) {
-            configService.write(context.response);
-            var _logMessage = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
-            configCtrl.emit('logger.agent.log', _logMessage);
-            configCtrl.emit('ready');
-        } else {
-            var _logMessage2 = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
-            configCtrl.emit('logger.agent.error', _logMessage2);
-        }
-    };
-
     configSignature = guid();
 
-    var logMessage = configCtrl.packLogMessage(undefined, 'config request signed with ' + configSignature);
-    configCtrl.emit('logger.agent.log', logMessage);
+    write = function write(kafkaMessage) {
+        var context = void 0,
+            isMyMessage = void 0;
+        context = kafkaService.extractContext(kafkaMessage);
+        isMyMessage = kafkaService.isMyMessage(configSignature, kafkaMessage);
 
-    kafkaService.subscribe('get-config-response', write);
+        if (context !== null && isMyMessage === true) {
+            configService.write(context.response);
+            var logMessage = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
+            configCtrl.emit('logger.agent.log', logMessage);
+            configCtrl.emit('ready');
+        } else if (context == null) {
+            var _logMessage = configCtrl.packLogMessage(undefined, 'kafkaMessage.value is null');
+            configCtrl.emit('logger.agent.error', _logMessage);
+        } else if (isMyMessage === false) {}
+    };
 
-    configService.getEnvObject().then(function (envObject) {
-        kafkaService.send('get-config-request', envObject);
-    }, function (error) {
-        configCtrl.emit('logger.agent.error', error);
-    });
+    configCtrl.start = function () {
+
+        kafkaService.subscribe('get-config-response', write);
+
+        configService.getEnvObject().then(function (envObject) {
+            var context = void 0;
+            context = kafkaService.createContext(configSignature, {}, envObject);
+            kafkaService.send('get-config-request', context);
+        }, function (error) {
+            configCtrl.emit('logger.agent.error', error);
+        });
+    };
 
     return configCtrl;
 };

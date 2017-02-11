@@ -9,40 +9,48 @@ module.exports = (configService, kafkaService, EventEmitter) => {
     let configCtrl = new EventEmitter();
 
     let write;
-    
+
     let configSignature;
 
+    configSignature = guid();
+
     write = kafkaMessage => {
-        let context;
+        let context, isMyMessage;
         context = kafkaService.extractContext(kafkaMessage);
-        if(context !== null) {
+        isMyMessage = kafkaService.isMyMessage(configSignature, kafkaMessage);
+
+        if(context !== null && isMyMessage === true) {
             configService.write(context.response);
             let logMessage = configCtrl.packLogMessage(this, 'kafkaMessage.value is null');
             configCtrl.emit('logger.agent.log', logMessage);
             configCtrl.emit('ready');
         }
-        else {
+        else if (context == null) {
             let logMessage = configCtrl.packLogMessage(this, 'kafkaMessage.value is null');
             configCtrl.emit('logger.agent.error', logMessage)
+        }
+        else if(isMyMessage === false) {
+
         }
 
     };
 
-    configSignature = guid();
 
-    let logMessage = configCtrl.packLogMessage(this, `config request signed with ${configSignature}`);
-    configCtrl.emit('logger.agent.log', logMessage);
+    configCtrl.start = () => {
+        
+        kafkaService.subscribe('get-config-response', write);
 
-    kafkaService.subscribe('get-config-response', write);
-
-    configService.getEnvObject().then(
-        (envObject) => {
-            kafkaService.send('get-config-request', envObject);
-        },
-        (error) => {
-            configCtrl.emit('logger.agent.error', error);
-        }
-    );
+        configService.getEnvObject().then(
+            (envObject) => {
+                let context;
+                context = kafkaService.createContext(configSignature, {}, envObject);
+                kafkaService.send('get-config-request', context);
+            },
+            (error) => {
+                configCtrl.emit('logger.agent.error', error);
+            }
+        );
+    };
 
     return configCtrl;
 };
