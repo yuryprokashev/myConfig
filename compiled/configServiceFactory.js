@@ -13,21 +13,6 @@ module.exports = function (configObject, EventEmitter) {
     var copyProperty = void 0,
         returnChildProperty = void 0;
 
-    copyProperty = function copyProperty(fromObj, toObj) {
-        for (var key in fromObj) {
-            if (toObj[key] !== undefined) {
-                Object.defineProperty(toObj, key, {
-                    configurable: true,
-                    enumerable: true,
-                    value: fromObj[key],
-                    writable: true
-                });
-            } else {
-                toObj[key] = fromObj[key];
-            }
-        }
-    };
-
     returnChildProperty = function returnChildProperty(targetObj, childPropertyName) {
         if (targetObj[childPropertyName] !== undefined) {
             return targetObj[childPropertyName];
@@ -56,6 +41,21 @@ module.exports = function (configObject, EventEmitter) {
         }
     };
 
+    copyProperty = function copyProperty(fromObj, toObj) {
+        for (var key in fromObj) {
+            if (toObj[key] !== undefined) {
+                Object.defineProperty(toObj, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: fromObj[key],
+                    writable: true
+                });
+            } else {
+                toObj[key] = fromObj[key];
+            }
+        }
+    };
+
     configService.write = function (configData) {
         copyProperty(configData, configObject);
     };
@@ -76,5 +76,6 @@ module.exports = function (configObject, EventEmitter) {
             });
         });
     };
+
     return configService;
 };

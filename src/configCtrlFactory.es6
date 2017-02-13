@@ -22,7 +22,7 @@ module.exports = (configService, kafkaService, EventEmitter) => {
 
         if(isContextOk && isMyMessage === true) {
             configService.write(context.response);
-            configCtrl.emit('logger.agent.log', 'write() in confirCtrl', 'everything is fine, config is written');
+            configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'everything is fine, config is written');
             configCtrl.emit('ready');
         }
         else if (!isContextOk) {
@@ -54,6 +54,23 @@ module.exports = (configService, kafkaService, EventEmitter) => {
                 configCtrl.emit('logger.agent.error', error);
             }
         );
+
+        kafkaService.on('log', (messageString) => {
+            configCtrl.emit('logger.agent.log', 'kafkaService', messageString);
+        });
+
+        kafkaService.on('error', (err) => {
+            configCtrl.emit('logger.agent.error', err);
+        });
+
+        configService.on('log', (messageString) => {
+            configCtrl.emit('logger.agent.log', 'configService', messageString);
+        });
+
+        configService.on('error', (err) => {
+            configCtrl.emit('logger.agent.error', err);
+        });
+
     };
 
     return configCtrl;

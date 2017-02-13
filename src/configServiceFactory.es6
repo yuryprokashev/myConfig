@@ -11,22 +11,6 @@ module.exports = (configObject, EventEmitter) => {
 
     let copyProperty,
         returnChildProperty;
-
-    copyProperty = (fromObj, toObj) => {
-        for(let key in fromObj) {
-            if(toObj[key] !== undefined) {
-                Object.defineProperty(toObj, key, {
-                    configurable: true,
-                    enumerable: true,
-                    value: fromObj[key],
-                    writable: true
-                });
-            }
-            else {
-                toObj[key] = fromObj[key];
-            }
-        }
-    };
     
     returnChildProperty = (targetObj, childPropertyName) => {
         if(targetObj[childPropertyName] !== undefined) {
@@ -59,6 +43,21 @@ module.exports = (configObject, EventEmitter) => {
         }
     };
 
+    copyProperty = (fromObj, toObj) => {
+        for(let key in fromObj) {
+            if(toObj[key] !== undefined) {
+                Object.defineProperty(toObj, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: fromObj[key],
+                    writable: true
+                });
+            }
+            else {
+                toObj[key] = fromObj[key];
+            }
+        }
+    };
 
     configService.write = configData => {
         copyProperty(configData, configObject);
@@ -82,5 +81,6 @@ module.exports = (configObject, EventEmitter) => {
             }
         )
     };
+
     return configService;
 };

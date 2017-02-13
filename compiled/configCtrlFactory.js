@@ -25,7 +25,7 @@ module.exports = function (configService, kafkaService, EventEmitter) {
 
         if (isContextOk && isMyMessage === true) {
             configService.write(context.response);
-            configCtrl.emit('logger.agent.log', 'write() in confirCtrl', 'everything is fine, config is written');
+            configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'everything is fine, config is written');
             configCtrl.emit('ready');
         } else if (!isContextOk) {
             var error = new Error('kafkaMessage.value is null');
@@ -48,6 +48,22 @@ module.exports = function (configService, kafkaService, EventEmitter) {
             configCtrl.emit('logger.agent.log', 'configService.getEnvObject', 'env object sent');
         }, function (error) {
             configCtrl.emit('logger.agent.error', error);
+        });
+
+        kafkaService.on('log', function (messageString) {
+            configCtrl.emit('logger.agent.log', 'kafkaService', messageString);
+        });
+
+        kafkaService.on('error', function (err) {
+            configCtrl.emit('logger.agent.error', err);
+        });
+
+        configService.on('log', function (messageString) {
+            configCtrl.emit('logger.agent.log', 'configService', messageString);
+        });
+
+        configService.on('error', function (err) {
+            configCtrl.emit('logger.agent.error', err);
         });
     };
 
