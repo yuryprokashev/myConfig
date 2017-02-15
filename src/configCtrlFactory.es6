@@ -30,10 +30,10 @@ module.exports = (configService, kafkaService, EventEmitter) => {
             configCtrl.emit('logger.agent.error', error);
         }
         else if(isMyMessage === false) {
-            configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'message arrived, but it is not mine');
+            // configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'message arrived, but it is not mine');
         }
         else {
-            configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'weird thing happened');
+            // configCtrl.emit('logger.agent.log', 'write() in configCtrl', 'weird thing happened');
         }
 
     };
